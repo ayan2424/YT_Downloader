@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaDownload, FaMusic, FaVideo } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 interface Format {
   itag: string;
@@ -123,10 +124,12 @@ const VideoInfo: React.FC<VideoInfoProps> = ({ videoInfo }) => {
     >
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-2/5">
-          <img
+          <Image
             src={videoInfo.thumbnailUrl}
             alt={videoInfo.title}
             className="w-full h-auto rounded-lg shadow-sm"
+            width={480}
+            height={360}
           />
         </div>
         

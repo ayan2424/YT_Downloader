@@ -4,20 +4,45 @@ import { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import AdsterraAd from "@/components/AdsterraAd";
 
+interface VideoDetails {
+  title: string;
+  author: string;
+  lengthSeconds: string;
+  viewCount: string;
+  thumbnailUrl: string;
+  videoId: string;
+  formats: Format[];
+  directUrls?: boolean;
+}
+
+interface Format {
+  itag: string;
+  mimeType: string;
+  qualityLabel: string;
+  bitrate: number;
+  audioQuality?: string;
+  contentLength?: string;
+  hasVideo: boolean;
+  hasAudio: boolean;
+  url?: string;
+}
+
+interface DownloadHistoryItem {
+  id: string;
+  title: string;
+  thumbnail: string;
+  format: string;
+  quality: string;
+  timestamp: string;
+  status: string;
+}
+
 export default function Home() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [videoInfo, setVideoInfo] = useState<any>(null);
-  const [downloadHistory, setDownloadHistory] = useState<Array<{
-    id: string;
-    title: string;
-    thumbnail: string;
-    format: string;
-    quality: string;
-    timestamp: string;
-    status: string;
-  }>>([]);
+  const [videoInfo, setVideoInfo] = useState<VideoDetails | null>(null);
+  const [downloadHistory, setDownloadHistory] = useState<DownloadHistoryItem[]>([]);
   const [showInterstitial, setShowInterstitial] = useState(false);
 
   // Show interstitial ad after 30 seconds
@@ -85,7 +110,7 @@ export default function Home() {
       const id = `${videoInfo.videoId}-${itag}-${timestamp}`;
       
       // Find the format info
-      const formatInfo = videoInfo.formats.find((f: any) => f.itag.toString() === itag.toString());
+      const formatInfo = videoInfo.formats.find((f: Format) => f.itag.toString() === itag.toString());
       const quality = formatInfo?.qualityLabel || (format === 'mp3' ? 'Audio' : 'Unknown');
       
       setDownloadHistory(prev => [
@@ -320,8 +345,8 @@ export default function Home() {
                   
                   <div className="flex flex-wrap gap-2 mb-4">
                     {videoInfo.formats
-                      .filter((format: any) => format.hasVideo)
-                      .map((format: any) => (
+                      .filter((format: Format) => format.hasVideo)
+                      .map((format: Format) => (
                         <button
                           key={format.itag}
                           onClick={() => handleDownload(format.itag, 'mp4')}
@@ -332,9 +357,9 @@ export default function Home() {
                       ))}
                     
                     {videoInfo.formats
-                      .filter((format: any) => !format.hasVideo && format.hasAudio)
+                      .filter((format: Format) => !format.hasVideo && format.hasAudio)
                       .slice(0, 1)
-                      .map((format: any) => (
+                      .map((format: Format) => (
                         <button
                           key={format.itag}
                           onClick={() => handleDownload(format.itag, 'mp3')}

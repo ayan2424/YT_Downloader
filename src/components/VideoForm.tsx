@@ -6,9 +6,9 @@ import toast from 'react-hot-toast';
 
 // Define interfaces
 interface VideoFormProps {
-  onVideoInfo: (info: any) => void;
+  onVideoInfo: (info: VideoInfo) => void;
   setLoading: (loading: boolean) => void;
-  setVideoInfo: (info: any) => void;
+  setVideoInfo: (info: VideoInfo | null) => void;
   setError: (error: string) => void;
   setDownloadHistory: React.Dispatch<React.SetStateAction<DownloadItem[]>>;
 }
@@ -27,6 +27,28 @@ interface DownloadItem {
   progress: number;
 }
 
+interface VideoInfo {
+  title: string;
+  author: string;
+  lengthSeconds: string;
+  viewCount: string;
+  thumbnailUrl: string;
+  formats: Format[];
+  limitedInfo?: boolean;
+}
+
+interface Format {
+  itag: string;
+  mimeType: string;
+  qualityLabel: string;
+  bitrate: number;
+  audioQuality?: string;
+  contentLength?: string;
+  hasVideo: boolean;
+  hasAudio: boolean;
+  url?: string;
+}
+
 // Less strict URL validation schema
 const VideoSchema = Yup.object().shape({
   url: Yup.string()
@@ -35,7 +57,7 @@ const VideoSchema = Yup.object().shape({
       (value) => !value || value.includes('youtube') || value.includes('youtu.be') || /[a-zA-Z0-9_-]{11}/.test(value))
 });
 
-const VideoForm: React.FC<VideoFormProps> = ({ onVideoInfo, setLoading, setVideoInfo, setError, setDownloadHistory }) => {
+const VideoForm: React.FC<VideoFormProps> = ({ setLoading, setVideoInfo, setError, setDownloadHistory }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -87,7 +109,7 @@ const VideoForm: React.FC<VideoFormProps> = ({ onVideoInfo, setLoading, setVideo
         return;
       }
       
-      const data = await response.json();
+      const data: VideoInfo = await response.json();
       
       // Check if we have limited info (from oEmbed fallback)
       if (data.limitedInfo) {
