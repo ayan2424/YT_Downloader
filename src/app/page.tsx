@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import AdsterraAd from "@/components/AdsterraAd";
+import Image from "next/image";
 
 interface VideoDetails {
   title: string;
@@ -40,7 +41,6 @@ interface DownloadHistoryItem {
 export default function Home() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [videoInfo, setVideoInfo] = useState<VideoDetails | null>(null);
   const [downloadHistory, setDownloadHistory] = useState<DownloadHistoryItem[]>([]);
   const [showInterstitial, setShowInterstitial] = useState(false);
@@ -59,13 +59,12 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     setVideoInfo(null);
 
     try {
       // Simple validation
       if (!url.trim()) {
-        setError("Please enter a YouTube URL or video ID");
+        toast.error("Please enter a YouTube URL or video ID");
         setLoading(false);
         return;
       }
@@ -81,7 +80,6 @@ export default function Home() {
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || "Failed to fetch video information");
         toast.error(data.error || "Failed to fetch video information");
         setLoading(false);
         return;
@@ -91,7 +89,6 @@ export default function Home() {
       setVideoInfo(data);
       toast.success("Video information fetched successfully!");
     } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
       toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -280,7 +277,6 @@ export default function Home() {
                     )}
                   </button>
                 </div>
-                {error && <div className="mt-1 text-sm text-red-600">{error}</div>}
               </div>
               
               <div className="text-xs text-gray-500">
@@ -333,10 +329,12 @@ export default function Home() {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
-                  <img 
+                  <Image 
                     className="h-48 w-full object-cover md:w-48" 
                     src={videoInfo.thumbnailUrl} 
-                    alt={videoInfo.title} 
+                    alt={videoInfo.title}
+                    width={192}
+                    height={192}
                   />
                 </div>
                 <div className="p-6">
@@ -408,10 +406,12 @@ export default function Home() {
               <div className="space-y-4">
                 {downloadHistory.map((item) => (
                   <div key={item.id} className="flex items-center border-b pb-3">
-                    <img 
+                    <Image 
                       src={item.thumbnail} 
                       alt={item.title} 
                       className="w-16 h-12 object-cover rounded mr-3"
+                      width={64}
+                      height={48}
                     />
                     <div className="flex-1">
                       <p className="font-medium text-gray-800 truncate">{item.title}</p>

@@ -58,20 +58,6 @@ const VideoSchema = Yup.object().shape({
 });
 
 const VideoForm: React.FC<VideoFormProps> = ({ setLoading, setVideoInfo, setError, setDownloadHistory }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Helper function to clean up YouTube URLs
-  const cleanYouTubeUrl = (url: string): string => {
-    // If it's just an ID (11 characters), convert it to a full URL
-    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
-      return `https://www.youtube.com/watch?v=${url}`;
-    }
-    
-    // Otherwise return as is
-    return url;
-  };
-
   const handleSubmit = async (values: FormValues, { setSubmitting, resetForm }: FormikHelpers<FormValues>) => {
     try {
       setError('');
@@ -147,6 +133,16 @@ const VideoForm: React.FC<VideoFormProps> = ({ setLoading, setVideoInfo, setErro
     }
   };
 
+  const cleanYouTubeUrl = (url: string): string => {
+    // If it's just an ID (11 characters), convert it to a full URL
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
+      return `https://www.youtube.com/watch?v=${url}`;
+    }
+    
+    // Otherwise return as is
+    return url;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <Formik
@@ -177,7 +173,6 @@ const VideoForm: React.FC<VideoFormProps> = ({ setLoading, setVideoInfo, setErro
                 </button>
               </div>
               <ErrorMessage name="url" component="div" className="mt-1 text-sm text-red-600" />
-              {errorMessage && <div className="mt-1 text-sm text-red-600">{errorMessage}</div>}
             </div>
             
             <div className="text-xs text-gray-500">
